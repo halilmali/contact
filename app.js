@@ -81,7 +81,7 @@ function getEmailAddress(contact) {
   const keys = Object.keys(contact);
   
   // Try primary email column
-  const emailKey = keys.find((key) => /email/i.test(normalizeHeader(key)) && !/email.?2/i.test(normalizeHeader(key)));
+  const emailKey = keys.find((key) => normalizeHeader(key) === 'email');
   const email = emailKey ? String(contact[emailKey]).trim() : '';
   
   // If primary email is "-" or empty, use Email2
@@ -90,7 +90,7 @@ function getEmailAddress(contact) {
   }
 
   // Fallback to email2 column
-  const email2Key = keys.find((key) => /email.?2/i.test(normalizeHeader(key)));
+  const email2Key = keys.find((key) => normalizeHeader(key) === 'email2');
   return email2Key ? String(contact[email2Key]).trim() : null;
 }
 
