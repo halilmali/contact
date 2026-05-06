@@ -84,7 +84,8 @@ function getEmailAddress(contact) {
   const emailKey = keys.find((key) => /email/i.test(normalizeHeader(key)) && !/email.?2/i.test(normalizeHeader(key)));
   const email = emailKey ? String(contact[emailKey]).trim() : '';
   
-  if (email) {
+  // If primary email is "-" or empty, use Email2
+  if (email && email !== '-') {
     return email;
   }
 
