@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mailing App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="page-shell">
+    <header>
+      <h1 class="page-title">Mailings</h1>
+      <p class="page-lead">Import contacts from Excel, personalize your email with dynamic merge fields, and send through Gmail with an app password.</p>
+      <div id="userInfo" style="display: none; margin-top: 10px;">
+        <span id="userEmail"></span>
+        <button type="button" class="button secondary" id="logoutBtn">Logout</button>
+      </div>
+    </header>
+
+    <div id="loginSection" class="card" style="max-width: 500px; margin: 30px auto;">
+      <h2>Login Required</h2>
+      <p>Please sign in with your Google account to continue.</p>
+      <a href="/auth" class="button primary" style="display: inline-block; padding: 10px 20px; text-decoration: none;">Sign in with Google</a>
+    </div>
+
+    <div class="grid grid-2" id="appContent" style="display: none;">
+      <section class="card">
+        <h2>Import Contacts</h2>
+        <p class="field-summary">Upload an Excel file with columns like <strong>Name</strong> and <strong>Email</strong>.</p>
+        <form id="uploadForm" class="field-group">
+          <label>
+            Excel file
+            <input type="file" id="excelFile" accept=".xlsx,.xls" required>
+          </label>
+          <button type="submit" class="button primary">Upload</button>
+        </form>
+        <div class="notice hidden" id="uploadNotice">Contacts loaded successfully.</div>
+      </section>
+
+      <form class="card hidden" id="composeSection">
+        <h2>Compose Message</h2>
+        <div class="field-group">
+          <label>
+            Email Subject
+            <input type="text" id="subject" placeholder="Your subject here..." required>
+          </label>
+          <label>
+            Email Body
+            <textarea id="body" placeholder="Hello {{Name}},\n\nWrite your email here..." required></textarea>
+          </label>
+        </div>
+
+        <div class="field-summary">
+          <strong>Available merge fields:</strong>
+          <div id="fieldButtons" class="button-row"></div>
+        </div>
+
+        <button type="submit" class="button primary">Send Emails</button>
+      </form>
+    </div>
+
+    <section class="card hidden" id="contactsSection">
+      <div class="contact-status">
+        <div>
+          <h2>Contacts</h2>
+          <p id="selectedCount">0 contacts selected</p>
+        </div>
+        <div class="button-row">
+          <button type="button" class="button secondary" id="selectAllButton">Select All</button>
+          <button type="button" class="button secondary" id="deselectAllButton">Deselect All</button>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>
+          Search contacts
+          <input type="search" id="filterInput" placeholder="Type name or email...">
+        </label>
+      </div>
+
+      <div class="notice">Fields detected: <span id="fieldSummary"></span></div>
+
+      <table class="contact-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Other fields</th>
+          </tr>
+        </thead>
+        <tbody id="contactTableBody"></tbody>
+      </table>
+    </section>
+    </div>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
