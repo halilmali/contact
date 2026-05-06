@@ -121,7 +121,7 @@ function displayContacts() {
     row.innerHTML = `
       <td><input type="checkbox" class="contact-checkbox" data-index="${index}"></td>
       <td>${name}</td>
-      <td>${email}</td>
+      <td><input type="email" value="${email}" class="email-input" data-index="${index}"></td>
       <td>${allFields}</td>
     `;
     contactTableBody.appendChild(row);
@@ -139,7 +139,10 @@ function filterContacts() {
   document.querySelectorAll('.contact-checkbox').forEach((checkbox) => {
     const row = checkbox.closest('tr');
     const cells = Array.from(row.querySelectorAll('td')).slice(1);
-    const text = cells.map((cell) => cell.textContent.toLowerCase()).join(' ');
+    const text = cells.map((cell) => {
+      const input = cell.querySelector('input[type="email"]');
+      return input ? input.value.toLowerCase() : cell.textContent.toLowerCase();
+    }).join(' ');
     row.style.display = text.includes(query) ? '' : 'none';
   });
 }
@@ -147,7 +150,9 @@ function filterContacts() {
 function collectRecipients() {
   return Array.from(document.querySelectorAll('.contact-checkbox:checked')).map((checkbox) => {
     const index = Number(checkbox.dataset.index);
-    return contacts[index];
+    const emailInput = document.querySelector(`.email-input[data-index="${index}"]`);
+    const editedEmail = emailInput ? emailInput.value.trim() : '';
+    return { ...contacts[index], email: editedEmail };
   });
 }
 

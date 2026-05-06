@@ -178,7 +178,7 @@ app.post('/send', requireAuth, async (req, res) => {
     });
 
     for (const contact of recipients) {
-      const toAddress = getEmailAddress(contact);
+      const toAddress = contact.email || getEmailAddress(contact);
       if (!toAddress) continue;
 
       const personalizedSubject = replaceMergeFields(subject, contact);
