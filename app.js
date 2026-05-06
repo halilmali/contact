@@ -16,7 +16,7 @@ if (process.env.NODE_ENV === 'production' || process.env.TRUST_PROXY === 'true')
 
 const CLIENT_ID = process.env.CLIENT_ID || 'YOUR_CLIENT_ID';
 const CLIENT_SECRET = process.env.CLIENT_SECRET || 'YOUR_CLIENT_SECRET';
-const BASE_URL = process.env.BASE_URL || (process.env.NODE_ENV === 'production'
+const BASE_URL = process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || (process.env.NODE_ENV === 'production'
   ? 'https://sisbcontact.yzz.me/mailing'
   : `http://localhost:${port}`);
 const REDIRECT_URI = process.env.REDIRECT_URI || `${BASE_URL}/oauth2callback`;
