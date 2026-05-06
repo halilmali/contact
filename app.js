@@ -77,21 +77,16 @@ function sanitizeContacts(contacts) {
   });
 }
 
-function getEmailAddress(contact) {
-  const keys = Object.keys(contact);
-  
-  // Try primary email column
-  const emailKey = keys.find((key) => normalizeHeader(key) === 'email');
-  const email = emailKey ? String(contact[emailKey]).trim() : '';
-  
-  // If primary email is "-" or empty, use Email2
-  if (email && email !== '-') {
-    return email;
-  }
+function createEmailRaw(from, to, subject, body) {
+  const email = [
+    `To: ${to}`,
+    `From: ${from}`,
+    `Subject: ${subject}`,
+    '',
+    body
+  ].join('\r\n');
 
-  // Fallback to email2 column
-  const email2Key = keys.find((key) => normalizeHeader(key) === 'email2');
-  return email2Key ? String(contact[email2Key]).trim() : null;
+  return Buffer.from(email).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
 // Middleware to check authentication
@@ -165,22 +160,7 @@ app.post('/send', requireAuth, async (req, res) => {
       return res.status(500).send('Authenticated user email is missing. Please re-authenticate.');
     }
 
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
-      auth: {
-        type: 'OAuth2',
-        user: userEmail,
-        clientId: CLIENT_ID,
-        clientSecret: CLIENT_SECRET,
-        refreshToken: req.session.tokens.refresh_token,
-        accessToken
-      },
-      connectionTimeout: 60000,
-      greetingTimeout: 30000,
-      socketTimeout: 60000
-    });
+    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
     for (const contact of recipients) {
       const toAddress = contact.email || getEmailAddress(contact);
@@ -189,11 +169,13 @@ app.post('/send', requireAuth, async (req, res) => {
       const personalizedSubject = replaceMergeFields(subject, contact);
       const personalizedBody = replaceMergeFields(body, contact);
 
-      await transporter.sendMail({
-        from: userEmail,
-        to: toAddress,
-        subject: personalizedSubject,
-        text: personalizedBody
+      const raw = createEmailRaw(userEmail, toAddress, personalizedSubject, personalizedBody);
+
+      await gmail.users.messages.send({
+        userId: 'me',
+        requestBody: {
+          raw: raw
+        }
       });
     }
 
@@ -207,7 +189,7 @@ app.get('/auth', (req, res) => {
   const authUrl = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
-    scope: ['https://mail.google.com/', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
+    scope: ['https://www.googleapis.com/auth/gmail.send', 'https://www.googleapis.com/auth/userinfo.email', 'https://www.googleapis.com/auth/userinfo.profile']
   });
   res.redirect(authUrl);
 });
