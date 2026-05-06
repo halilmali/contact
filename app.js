@@ -166,7 +166,9 @@ app.post('/send', requireAuth, async (req, res) => {
     }
 
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
       auth: {
         type: 'OAuth2',
         user: userEmail,
@@ -174,7 +176,10 @@ app.post('/send', requireAuth, async (req, res) => {
         clientSecret: CLIENT_SECRET,
         refreshToken: req.session.tokens.refresh_token,
         accessToken
-      }
+      },
+      connectionTimeout: 60000,
+      greetingTimeout: 30000,
+      socketTimeout: 60000
     });
 
     for (const contact of recipients) {
