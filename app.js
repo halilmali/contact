@@ -256,7 +256,6 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   const environment = process.env.NODE_ENV || 'development';
   const url = process.env.NODE_ENV === 'production'
-    ? 'https://sisbcontact.yzz.me/mailing/'
+    ? 'https://contact-kely.onrender.com/'
     : `http://localhost:${port}`;
-  console.log(`Server running at ${url} (${environment})`);
 });
